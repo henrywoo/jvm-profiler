@@ -25,7 +25,7 @@ This command creates **jvm-profiler.jar** file with the default reporters like C
 
 You could upload jvm-profiler jar file to HDFS so the Spark application executors could access it. Then add configuration like following when launching Spark application:
 
-```
+```Bash
 --conf spark.jars=hdfs://hdfs_url/lib/jvm-profiler-1.0.0.jar
 --conf spark.executor.extraJavaOptions=-javaagent:jvm-profiler-1.0.0.jar
 ```
@@ -33,16 +33,18 @@ You could upload jvm-profiler jar file to HDFS so the Spark application executor
 ## Example to Run with Java Application
 
 Following command will start the example application with the profiler agent attached, which will report metrics to the console output:
-```
+
+```Bash
 java -javaagent:target/jvm-profiler-1.0.0.jar=reporter=com.uber.profiling.reporters.ConsoleOutputReporter,tag=mytag,metricInterval=5000,durationProfiling=com.uber.profiling.examples.HelloWorldApplication.publicSleepMethod,argumentProfiling=com.uber.profiling.examples.HelloWorldApplication.publicSleepMethod.1,sampleInterval=100 \
-  -cp target/jvm-profiler-1.0.0.jar \
-  com.uber.profiling.examples.HelloWorldApplication
+-cp target/jvm-profiler-1.0.0.jar \
+com.uber.profiling.examples.HelloWorldApplication
 ```
 
 ## Example to Run with Executable Jar
 
 Use following command to run jvm profiler with executable jar application.
-```
+
+```Bash
 java -javaagent:/opt/jvm-profiler/target/jvm-profiler-1.0.0.jar=reporter=com.uber.profiling.reporters.ConsoleOutputReporter,metricInterval=5000,durationProfiling=foo.bar.FooAppication.barMethod,sampleInterval=5000 \
 -jar foo-application.jar
 ```
@@ -50,14 +52,16 @@ java -javaagent:/opt/jvm-profiler/target/jvm-profiler-1.0.0.jar=reporter=com.ube
 ## Example to Run with Tomcat
 
 Set the jvm profiler in CATALINA_OPTS before starting the tomcat server. Check logs/catalina.out file for metrics.
-```
+
+```Bash
 export CATALINA_OPTS="$CATALINA_OPTS -javaagent:/opt/jvm-profiler/target/jvm-profiler-1.0.0.jar=reporter=com.uber.profiling.reporters.ConsoleOutputReporter,metricInterval=5000,durationProfiling=foo.bar.FooController.barMethod,sampleInterval=5000"
 ```
 
 ## Example to Run with Spring Boot Maven Plugin
 
 Use following command to use jvm profiler with Spring Boot 2.x. For Spring Boot 1.x use `-Drun.arguments` instead of `-Dspring-boot.run.jvmArguments` in following command.
-```
+
+```Bash
 mvn spring-boot:run -Dspring-boot.run.jvmArguments="-javaagent:/opt/jvm-profiler/target/jvm-profiler-1.0.0.jar=reporter=com.uber.profiling.reporters.ConsoleOutputReporter,metricInterval=5000,durationProfiling=foo.bar.FooController.barMethod,sampleInterval=5000"
 ```
 
@@ -65,9 +69,10 @@ mvn spring-boot:run -Dspring-boot.run.jvmArguments="-javaagent:/opt/jvm-profiler
 
 Uber JVM Profiler supports sending metrics to Kafka. For example,
 
-```java
+```Bash
 java -javaagent:target/jvm-profiler-1.0.0.jar=reporter=com.uber.profiling.reporters.KafkaOutputReporter,metricInterval=5000,brokerList=localhost:9092,topicPrefix=profiler_ -cp target/jvm-profiler-1.0.0.jar com.uber.profiling.examples.HelloWorldApplication
 ```
+
 It will send metrics to Kafka topic profiler_CpuAndMemory. See bottom of this document for an example of the metrics.
 
 ## More Details
@@ -94,7 +99,7 @@ Uber JVM Profiler supports following features:
 
 The java agent supports following parameters, which could be used in Java command line like:
 
-```bash
+```Bash
 -javaagent:agent_jar_file.jar=param1=value1,param2=value2
 ```
 
@@ -245,7 +250,7 @@ Following is an example of CPU and Memory metrics when using `ConsoleOutputRepor
 
 We can take the output of Stacktrack Profiling to generate flamegraph to visualize CPU time. Using the Python script `stackcollapse.py`, following command will collapse Stacktrack Profiling json output file to the input file format for generating flamegraph. The script `flamegraph.pl` can be found at [FlameGraph](https://github.com/brendangregg/FlameGraph).
 
-```python
+```Bash
 python stackcollapse.py -i Stacktrace.json > Stacktrace.folded
 flamegraph.pl Stacktrace.folded > Stacktrace.svg
 ```
