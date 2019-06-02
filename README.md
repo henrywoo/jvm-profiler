@@ -34,14 +34,17 @@ You could upload jvm-profiler jar file to HDFS so the Spark application executor
 
 Following command will start the example application with the profiler agent attached, which will report metrics to the console output:
 ```
-java -javaagent:target/jvm-profiler-1.0.0.jar=reporter=com.uber.profiling.reporters.ConsoleOutputReporter,tag=mytag,metricInterval=5000,durationProfiling=com.uber.profiling.examples.HelloWorldApplication.publicSleepMethod,argumentProfiling=com.uber.profiling.examples.HelloWorldApplication.publicSleepMethod.1,sampleInterval=100 -cp target/jvm-profiler-1.0.0.jar com.uber.profiling.examples.HelloWorldApplication
+java -javaagent:target/jvm-profiler-1.0.0.jar=reporter=com.uber.profiling.reporters.ConsoleOutputReporter,tag=mytag,metricInterval=5000,durationProfiling=com.uber.profiling.examples.HelloWorldApplication.publicSleepMethod,argumentProfiling=com.uber.profiling.examples.HelloWorldApplication.publicSleepMethod.1,sampleInterval=100 \
+  -cp target/jvm-profiler-1.0.0.jar \
+  com.uber.profiling.examples.HelloWorldApplication
 ```
 
 ## Example to Run with Executable Jar
 
 Use following command to run jvm profiler with executable jar application.
 ```
-java -javaagent:/opt/jvm-profiler/target/jvm-profiler-1.0.0.jar=reporter=com.uber.profiling.reporters.ConsoleOutputReporter,metricInterval=5000,durationProfiling=foo.bar.FooAppication.barMethod,sampleInterval=5000 -jar foo-application.jar
+java -javaagent:/opt/jvm-profiler/target/jvm-profiler-1.0.0.jar=reporter=com.uber.profiling.reporters.ConsoleOutputReporter,metricInterval=5000,durationProfiling=foo.bar.FooAppication.barMethod,sampleInterval=5000 \
+-jar foo-application.jar
 ```
 
 ## Example to Run with Tomcat
@@ -62,7 +65,7 @@ mvn spring-boot:run -Dspring-boot.run.jvmArguments="-javaagent:/opt/jvm-profiler
 
 Uber JVM Profiler supports sending metrics to Kafka. For example,
 
-```
+```java
 java -javaagent:target/jvm-profiler-1.0.0.jar=reporter=com.uber.profiling.reporters.KafkaOutputReporter,metricInterval=5000,brokerList=localhost:9092,topicPrefix=profiler_ -cp target/jvm-profiler-1.0.0.jar com.uber.profiling.examples.HelloWorldApplication
 ```
 It will send metrics to Kafka topic profiler_CpuAndMemory. See bottom of this document for an example of the metrics.
@@ -89,7 +92,11 @@ Uber JVM Profiler supports following features:
 
 ## Parameter List
 
-The java agent supports following parameters, which could be used in Java command line like "-javaagent:agent_jar_file.jar=param1=value1,param2=value2":
+The java agent supports following parameters, which could be used in Java command line like:
+
+```bash
+-javaagent:agent_jar_file.jar=param1=value1,param2=value2
+```
 
 - reporter: class name for the reporter, e.g. com.uber.profiling.reporters.ConsoleOutputReporter, or com.uber.profiling.reporters.KafkaOutputReporter, which are already implemented in the code. You could implement your own reporter and set the name here.
 
@@ -119,14 +126,14 @@ The java agent supports following parameters, which could be used in Java comman
 
 The parameters could be provided as arguments in java command, or in a YAML config file if you use configProvider=com.uber.profiling.YamlConfigProvider. Following is an example of the YAML config file:
 
-```
+```yaml
 reporter: com.uber.profiling.reporters.ConsoleOutputReporter
 metricInterval: 5000
 ```
 
 ## Metrics Example
 
-Following is an example of CPU and Memory metrics when using ConsoleOutputReporter or KafkaOutputReporter:
+Following is an example of CPU and Memory metrics when using `ConsoleOutputReporter` or `KafkaOutputReporter`:
 
 ```json
 {
@@ -238,7 +245,7 @@ Following is an example of CPU and Memory metrics when using ConsoleOutputReport
 
 We can take the output of Stacktrack Profiling to generate flamegraph to visualize CPU time. Using the Python script `stackcollapse.py`, following command will collapse Stacktrack Profiling json output file to the input file format for generating flamegraph. The script `flamegraph.pl` can be found at [FlameGraph](https://github.com/brendangregg/FlameGraph).
 
-```
+```python
 python stackcollapse.py -i Stacktrace.json > Stacktrace.folded
 flamegraph.pl Stacktrace.folded > Stacktrace.svg
 ```
